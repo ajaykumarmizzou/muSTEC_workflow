@@ -1,97 +1,98 @@
 #!/bin/bash
 echo "Welcome to muSTEC workflow setup script!"
-ref=$1 #Passing reference file as argument
+
+#Taking reference genome as input
+ref_genome=$1 #Passing reference file as argument
 #Check if reference file exists
-if [ ! -f "$ref" ]; then
+if [ ! -f "$ref_genome" ]; then
     echo "Reference file does not exist!"
     exit 1
 fi
 # less $ref
+
+#Taking reads as input
 #Add a flag for single and paired end reads
 echo "Are your reads single or paired end? (s/p)"
 read flag
 if [ "$flag" == "s" ]; then
     echo "Single end reads selected"
 #Here each sample for single end file reads and continues for the pipeline
-# ------------------------------------------------------------------------------------------------------------------------
-#Analysis starts heregit remote add origin https://github.com/ajaykumarmizzou/muSTEC_workflow.git
+# -----------------------------------------------------------------------------------------------
+#Analysis starts here 
 #Count total number of files in the data directory
-    total_files=$(ls -l data/tura_data/*.fsa_nt | wc -l)
-    echo "Total files: $total_files"
-#read files in i variable
-    for ((i=1;i<=total_files;i++))
-    do
-        # echo "Sample $i:"
-        file=$(ls data/tura_data/*.fsa_nt | sed -n "$i"p)
-        # less $file
-        # echo "Read: $file"
-        # echo "Is this correct? (y/n)"
-        # read ans
-        # if [ "$ans" == "y" ]; then
-        #     echo "Correct!"
-        # else
-        #     echo "Incorrect!"
-        #     exit 1
-        # fi #Files successfully readed in i variable so far
+#     total_files=$(ls -l data/tura_data/*.fsa_nt | wc -l)
+#     echo "Total files: $total_files"
+# #read files in i variable
+#     for ((i=1;i<=total_files;i++))
+#     do
+#         # echo "Sample $i:"
+#         file=$(ls data/tura_data/*.fsa_nt | sed -n "$i"p)
+#         # less $file
+#         # echo "Read: $file"
+#         # echo "Is this correct? (y/n)"
+#         # read ans
+#         # if [ "$ans" == "y" ]; then
+#         #     echo "Correct!"
+#         # else
+#         #     echo "Incorrect!"
+#         #     exit 1
+#         # fi #Files successfully readed in i variable so far
     
-#Alignment of sequences samples to reference genome - samtools alignment
-#run bwa mem for each sample
-    f=$(echo "./data/tura_data/"${file%%.*}.1.fsa_nt"" | sed 's|/data/tura_data||')
-    s=$(echo "./results/aligned/sam/"${file%%.*}.sam"" | sed 's|/data/tura_data||')
-    bwa mem $ref $f > $s
-    echo "Alignment done!"
-#Converting sam file into bam
-    bam=$(echo "./results/aligned/bam/"${file%%.*}.bam"" | sed 's|/data/tura_data||')
-    samtools view -bS $s > $bam
-    echo "Converting sam into bam, done!"
-#Sorting bam file
-    sorted=$(echo "./results/aligned/sorted_bam/"${file%%.*}.sorted.bam"" | sed 's|/data/tura_data||')
-    samtools sort $bam -o $sorted
-    echo "Sorting bam, done!"
-#samtools flagstats
-    flagstats=$(echo "./results/aligned/flagstats/"${file%%.*}.flagstats.txt"" | sed 's|/data/tura_data||')
-    samtools flagstat $sorted > $flagstats
-    echo "Samtools flagstats, done!"
-#bcf mpileup
-    mpileup=$(echo "./results/variant_calling/bcf/"${file%%.*}.bcf"" | sed 's|/data/tura_data||')
-    bcftools mpileup -O b -o $mpileup -f $ref $sorted
-    echo "bcf mpileup, done!"
-#Identify SNVs using call ploidy
-    vcf=$(echo "./results/variant_calling/vcf/"${file%%.*}.vcf"" | sed 's|/data/tura_data||')
-    bcftools call --ploidy 1 -m -v -o $vcf $mpileup
-    echo "Identifying SNVs, done!"
-#Filter using varFilter
-    filtered=$(echo "./results/variant_calling/filtered_vcf/"${file%%.*}.vcf"" | sed 's|/data/tura_data||')
-    vcfutils.pl varFilter $vcf > $filtered
-    echo "Filtering SNVs, done!"
-#bcftools stats to generate vcf stats
-    stats=$(echo "./results/variant_calling/vcf_stats/"${file%%.*}.vcf.txt"" | sed 's|/data/tura_data||')
-    bcftools stats -F $ref -s - $filtered > $stats
-    echo "Generating vcf stats, done!"
-#plot-vcfstats
-    # plot=$(echo "./results/variant_calling/vcf_stats/"${file%%.*}.vcf.plot.pdf"" | sed 's|/data/tura_data||')
-    # plot-vcfstats -p $plot $stats
-    # echo "Plotting vcf stats, done!"
-#sort variants
-    sorted_vcf=$(echo "./results/variant_calling/sorted_vcf/"${file%%.*}.sorted.vcf"" | sed 's|/data/tura_data||')
-    bcftools sort -o $sorted_vcf $filtered
-    echo "Sorting vcf, done!"
-#bgzip and tabix
-    bgzip $sorted_vcf
-    tabix -p vcf $sorted_vcf.gz
-    echo "bgzip and tabix, done!"
-    done
-#Merge into single vcf file
-bcftools merge ./results/variants/sorted_vcf/*.gz > ./results/variant_calling/merged_variants/merged.vcf
-echo "Merging vcf, done!"
-
-
-
+# #Alignment of sequences samples to reference genome - samtools alignment
+# #run bwa mem for each sample
+#     f=$(echo "./data/tura_data/"${file%%.*}.1.fsa_nt"" | sed 's|/data/tura_data||')
+#     s=$(echo "./results/aligned/sam/"${file%%.*}.sam"" | sed 's|/data/tura_data||')
+#     bwa mem $ref $f > $s
+#     echo "Alignment done!"
+# #Converting sam file into bam
+#     bam=$(echo "./results/aligned/bam/"${file%%.*}.bam"" | sed 's|/data/tura_data||')
+#     samtools view -bS $s > $bam
+#     echo "Converting sam into bam, done!"
+# #Sorting bam file
+#     sorted=$(echo "./results/aligned/sorted_bam/"${file%%.*}.sorted.bam"" | sed 's|/data/tura_data||')
+#     samtools sort $bam -o $sorted
+#     echo "Sorting bam, done!"
+# #samtools flagstats
+#     flagstats=$(echo "./results/aligned/flagstats/"${file%%.*}.flagstats.txt"" | sed 's|/data/tura_data||')
+#     samtools flagstat $sorted > $flagstats
+#     echo "Samtools flagstats, done!"
+# #bcf mpileup
+#     mpileup=$(echo "./results/variant_calling/bcf/"${file%%.*}.bcf"" | sed 's|/data/tura_data||')
+#     bcftools mpileup -O b -o $mpileup -f $ref $sorted
+#     echo "bcf mpileup, done!"
+# #Identify SNVs using call ploidy
+#     vcf=$(echo "./results/variant_calling/vcf/"${file%%.*}.vcf"" | sed 's|/data/tura_data||')
+#     bcftools call --ploidy 1 -m -v -o $vcf $mpileup
+#     echo "Identifying SNVs, done!"
+# #Filter using varFilter
+#     filtered=$(echo "./results/variant_calling/filtered_vcf/"${file%%.*}.vcf"" | sed 's|/data/tura_data||')
+#     vcfutils.pl varFilter $vcf > $filtered
+#     echo "Filtering SNVs, done!"
+# #bcftools stats to generate vcf stats
+#     stats=$(echo "./results/variant_calling/vcf_stats/"${file%%.*}.vcf.txt"" | sed 's|/data/tura_data||')
+#     bcftools stats -F $ref -s - $filtered > $stats
+#     echo "Generating vcf stats, done!"
+# #plot-vcfstats
+#     # plot=$(echo "./results/variant_calling/vcf_stats/"${file%%.*}.vcf.plot.pdf"" | sed 's|/data/tura_data||')
+#     # plot-vcfstats -p $plot $stats
+#     # echo "Plotting vcf stats, done!"
+# #sort variants
+#     sorted_vcf=$(echo "./results/variant_calling/sorted_vcf/"${file%%.*}.sorted.vcf"" | sed 's|/data/tura_data||')
+#     bcftools sort -o $sorted_vcf $filtered
+#     echo "Sorting vcf, done!"
+# #bgzip and tabix
+#     bgzip $sorted_vcf
+#     tabix -p vcf $sorted_vcf.gz
+#     echo "bgzip and tabix, done!"
+#     done
+# #Merge into single vcf file
+# bcftools merge ./results/variants/sorted_vcf/*.gz > ./results/variant_calling/merged_variants/merged.vcf
+# echo "Merging vcf, done!"
 #For loop to merge all sorted_vcf.gz files into merged.vcf file using bcftools
 #Analysis ends here
 # ------------------------------------------------------------------------------------------------------------------------
 
-
+#Analysis for paired end reads
 elif [ "$flag" == "p" ]; then
     echo "Paired end reads selected"
 #Here each sample for two paired end files reads and continues for the pipeline
