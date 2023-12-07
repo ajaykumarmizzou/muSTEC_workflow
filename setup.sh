@@ -14,7 +14,7 @@ if [ "$flag" == "s" ]; then
     echo "Single end reads selected"
 #Here each sample for single end file reads and continues for the pipeline
 # ------------------------------------------------------------------------------------------------------------------------
-#Analysis starts here
+#Analysis starts heregit remote add origin https://github.com/ajaykumarmizzou/muSTEC_workflow.git
 #Count total number of files in the data directory
     total_files=$(ls -l data/tura_data/*.fsa_nt | wc -l)
     echo "Total files: $total_files"
