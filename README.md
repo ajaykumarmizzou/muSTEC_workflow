@@ -1,19 +1,19 @@
-# muSTEC: muSTEC : An Integrated Bioinformatics Analysis Suite for the Identification, Characterization, and Outbreak Investigation of Shiga Toxin-Producing E. coli (STEC) strains using Whole Genome Sequencing (WGS) data
+# muSTEC: An Integrated Bioinformatics Analysis Suite for the Identification, Characterization, and Outbreak Investigation of Shiga Toxin-Producing E. coli (STEC) strains using Whole Genome Sequencing (WGS) data
 muSTEC workflow takes E-coli accessions list and performs SNP variant calling using gatk or bcftools for single/paired end fastq reads. 
 
 ## Prerequisites:
--  Create conda environment using given conda_env.yaml file, 
-        conda env create -f conda_env.yaml
--  Activate conda environment using,
-        conda activate conda_env
+-  Create conda environment using given conda_env.yaml file, \
+        'conda env create -f conda_env.yaml'
+-  Activate conda environment using, \
+       ' conda activate conda_env'
 
 
 ## Usage:
-Step: 1 Clone the repository on your computer/server using,
-        git clone https://github.com/ajaykumarmizzou/muSTEC_workflow
+Step: 1 Clone the repository on your computer/server using, \
+        'git clone https://github.com/ajaykumarmizzou/muSTEC_workflow'
 
-Step: 2 Pass your accession list of SNP variant calling and call the setup.sh,
-        ./setup.sh accession_list.txt
+Step: 2 Pass your accession list of SNP variant calling and call the setup.sh, \
+        './setup.sh accession_list.txt'
 
 Step: 3 Your data will download in /data directory and results will store in /results directory.
 
